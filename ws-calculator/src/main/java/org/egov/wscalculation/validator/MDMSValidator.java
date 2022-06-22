@@ -3,6 +3,7 @@ package org.egov.wscalculation.validator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import org.egov.wscalculation.constants.MRConstants;
 import org.egov.wscalculation.web.models.MeterConnectionRequest;
 import org.egov.wscalculation.web.models.MeterReading;
 import org.egov.wscalculation.repository.ServiceRequestRepository;
+import org.egov.wscalculation.util.CalculatorUtil;
 import org.egov.wscalculation.util.MeterReadingUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +25,7 @@ import org.springframework.util.CollectionUtils;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONArray;
 
 @Slf4j
 @Component
@@ -30,6 +33,9 @@ public class MDMSValidator {
 
 	@Autowired
 	private MeterReadingUtil meterReadingUtil;
+	
+	@Autowired
+	private CalculatorUtil calculationUtil;
 
 	@Autowired
 	private ServiceRequestRepository serviceRequestRepository;
@@ -114,6 +120,51 @@ public class MDMSValidator {
 			log.error("Error while fetching MDMS data", e);
 			throw new CustomException(MRConstants.INVALID_BILLING_PERIOD, MRConstants.INVALID_BILLING_PERIOD_MSG);
 		}
+	}
+
+	public void validateAnnualAdvaceMasterData(Object annualAdvanceMaster) {
+		Map<String, String> errorMap = new HashMap<>();
+		String finYear = calculationUtil.getFinancialYear();
+		LinkedHashMap<String, Object> applicableMasterData = getApplicableMasterData(annualAdvanceMaster, finYear);
+		
+		if(applicableMasterData == null) {
+			errorMap.put("INVALID_MASTER_DATA", "No configuration found for this financial year");
+		} else {
+			Integer annualRebate = (Integer) applicableMasterData.get("annualRebate");
+			Boolean isActive = (Boolean) applicableMasterData.get("isActive");
+			Long startingDay = (Long) applicableMasterData.get("startingDay");
+			Long endingDay = (Long) applicableMasterData.get("endingDay");
+			
+			if(isActive == null || isActive==Boolean.FALSE) {
+				errorMap.put("INVALID_MASTER_DATA", "Annual Advance payment window is not activate");
+			}
+			
+			Long currentTime = System.currentTimeMillis();
+			if(startingDay > currentTime || currentTime > endingDay) {
+				errorMap.put("INVALID_MASTER_DATA", "Annual Advance payment window is not activate");
+			}
+			
+			if(annualRebate == null) {
+				errorMap.put("INVALID_MASTER_DATA", "Annual Advance configuration is wrong");
+			}
+		}
+		
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+		
+	}
+	
+	private LinkedHashMap<String, Object> getApplicableMasterData(Object annualAdvanceMaster, String finYear) {
+		JSONArray annualAdvanceMD = (JSONArray) annualAdvanceMaster;
+		LinkedHashMap<String, Object> applicableMasterData = null;
+		for (Object annualAdvance : annualAdvanceMD) {
+			LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>) annualAdvance;
+			if(finYear.equalsIgnoreCase(data.get("fromFY").toString())) {
+				applicableMasterData = data;
+				break;
+			};
+		}
+		return applicableMasterData;
 	}
 	
 	

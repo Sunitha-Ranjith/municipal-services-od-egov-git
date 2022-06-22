@@ -477,7 +477,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	public AnnualPaymentDetails getAnnualPaymentEstimation(@Valid CalculationReq request) {
 		Map<String, Object> masterMap = masterDataService.loadMasterData(request.getRequestInfo(),
 				request.getCalculationCriteria().get(0).getTenantId());
-		annualAdvanceService.applicationValidation(request.getRequestInfo(), request.getCalculationCriteria());
+		annualAdvanceService.applicationValidation(request.getRequestInfo(), request.getCalculationCriteria(), masterMap);
 		AnnualPaymentDetails annualPaymentDetails = estimationService.getAnnualAdvanceEstimation(request.getCalculationCriteria().get(0), request.getRequestInfo(),
 				masterMap);
 		return annualPaymentDetails;
