@@ -76,10 +76,10 @@ public class WaterFieldValidator implements WaterActionValidator {
 					|| waterConnectionRequest.getWaterConnection().getConnectionExecutionDate() <= 0L) {
 				errorMap.put("INVALID_CONNECTION_EXECUTION_DATE", "Connection execution date should not be empty");
 			}
-			if (!StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionExecutionDate())
-					&& System.currentTimeMillis() > waterConnectionRequest.getWaterConnection().getConnectionExecutionDate()) {
-				errorMap.put("INVALID_CONNECTION_EXECUTION_DATE", "Connection execution date cannot be past");
-			}
+//			if (!StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionExecutionDate())
+//					&& System.currentTimeMillis() > waterConnectionRequest.getWaterConnection().getConnectionExecutionDate()) {
+//				errorMap.put("INVALID_CONNECTION_EXECUTION_DATE", "Connection execution date cannot be past");
+//			}
 		}
 		if (WCConstants.APPROVE_CONNECTION_CONST
 				.equalsIgnoreCase(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())) {
@@ -120,10 +120,10 @@ public class WaterFieldValidator implements WaterActionValidator {
 			if (StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionExecutionDate())) {
 				errorMap.put("INVALID_CONNECTION_EXECUTION_DATE", "Connection execution date should not be empty");
 			}
-			if (!StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionExecutionDate())
-					&& System.currentTimeMillis() > waterConnectionRequest.getWaterConnection().getConnectionExecutionDate()) {
-				errorMap.put("INVALID_CONNECTION_EXECUTION_DATE", "Connection execution date cannot be past");
-			}
+//			if (!StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionExecutionDate())
+//					&& System.currentTimeMillis() > waterConnectionRequest.getWaterConnection().getConnectionExecutionDate()) {
+//				errorMap.put("INVALID_CONNECTION_EXECUTION_DATE", "Connection execution date cannot be past");
+//			}
 		}
 		if ((WCConstants.SUBMIT_APPLICATION_CONST
 				.equals(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())

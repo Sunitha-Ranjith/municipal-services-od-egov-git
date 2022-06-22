@@ -50,6 +50,7 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 				currentWaterConnection.setConnectionNo(rs.getString("connectionNo"));
 				currentWaterConnection.setOldConnectionNo(rs.getString("oldConnectionNo"));
 				currentWaterConnection.setPipeSize(rs.getDouble("pipeSize"));
+				currentWaterConnection.setNoOfFlats(rs.getInt("noofflats"));
 				currentWaterConnection.setNoOfTaps(rs.getInt("noOfTaps"));
 				currentWaterConnection.setProposedPipeSize(rs.getDouble("proposedPipeSize"));
 				currentWaterConnection.setProposedTaps(rs.getInt("proposedTaps"));

@@ -2,6 +2,7 @@ package org.egov.wscalculation.service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.validation.Valid;
@@ -10,6 +11,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.wscalculation.constants.WSCalculationConstant;
 import org.egov.wscalculation.repository.WSCalculationDao;
 import org.egov.wscalculation.util.CalculatorUtil;
+import org.egov.wscalculation.validator.MDMSValidator;
 import org.egov.wscalculation.validator.WSCalculationValidator;
 import org.egov.wscalculation.validator.WSCalculationWorkflowValidator;
 import org.egov.wscalculation.web.models.AnnualAdvance.AnnualAdvanceStatus;
@@ -40,6 +42,9 @@ public class AnnualAdvanceService {
 	private WSCalculationValidator wsCalculationValidator;
 	
 	@Autowired
+	private MDMSValidator mdmsValidator;
+	
+	@Autowired
 	private WSCalculationDao wSCalculationDao;
 	
 	public void enrichRequest(@Valid AnnualAdvanceRequest annualAdvanceRequests) {
@@ -60,8 +65,9 @@ public class AnnualAdvanceService {
 		annualAdvanceRequests.getAnnualAdvance().setAuditDetails(auditDetails);
 	}
 	
-	public void applicationValidation(RequestInfo requestInfo, List<CalculationCriteria> calculationCriteria) {
+	public void applicationValidation(RequestInfo requestInfo, List<CalculationCriteria> calculationCriteria, Map<String, Object> masterMap) {
 		CalculationCriteria criteria = calculationCriteria.get(0);
+		mdmsValidator.validateAnnualAdvaceMasterData(masterMap.get(WSCalculationConstant.WC_ANNUAL_ADVANCE_MASTER));
 		wsCalulationWorkflowValidator.waterApplicationValidationForAnnualAdvance(requestInfo, criteria.getTenantId(), criteria.getConnectionNo());
 		wsCalculationValidator.validateAnnualAdvance(requestInfo, criteria.getTenantId(), criteria.getConnectionNo());
 	}
