@@ -233,7 +233,7 @@ public class WSCalculationConstant {
 
 	public static final String WS_METER_CHARGE = "WS_METER_CHARGE";
 	
-	public static final String WS_SECURITY_CHARGE = "WS_SECURITY_CHARGE";
+//	public static final String WS_SECURITY_CHARGE = "WS_SECURITY_CHARGE";
 	
 	public static final String WS_OTHER_CHARGE = "WS_OTHER_CHARGE";
 	
@@ -327,7 +327,7 @@ public class WSCalculationConstant {
 	public static final String VOLUMETRIC_CONSUMPTION = "volumetricConsumtion";
 	
 	public static final String SW_SCRUTINY_FEE = "SW_SCRUTINY_FEE";
-	public static final String SW_SECURITY_CHARGE = "SW_SECURITY_CHARGE";
+//	public static final String SW_SECURITY_CHARGE = "SW_SECURITY_CHARGE";
 	public static final String SW_CHARGE = "SW_CHARGE";
 	public static final String SW_WATER_CESS = "SW_SEWERAGE_CESS";
 
