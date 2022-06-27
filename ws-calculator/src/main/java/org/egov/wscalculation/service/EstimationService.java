@@ -806,8 +806,10 @@ public class EstimationService {
 		List<TaxHeadEstimate> estimates = new ArrayList<>();
 		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.SW_SCRUTINY_FEE)
 				.estimateAmount(scrutinyFee.setScale(2, 2)).build());
-		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.SW_SECURITY_CHARGE)
-				.estimateAmount(securityCharge.setScale(2, 2)).build());
+		// Security charge is not applicable now
+		// TODO: Need to remove the security fee component
+//		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.SW_SECURITY_CHARGE)
+//				.estimateAmount(securityCharge.setScale(2, 2)).build());
 
 		return estimates;
 	}
@@ -906,8 +908,10 @@ public class EstimationService {
 				List<TaxHeadEstimate> estimates = new ArrayList<>();
 				estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_SCRUTINY_FEE)
 						.estimateAmount(scrutinyFee.setScale(2, 2)).build());
-				estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_SECURITY_CHARGE)
-						.estimateAmount(securityCharge.setScale(2, 2)).build());
+				// Security charge is not applicable now
+				// TODO: Need to remove the security fee component
+//				estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_SECURITY_CHARGE)
+//						.estimateAmount(securityCharge.setScale(2, 2)).build());
 				
 				if(labourFee.compareTo(BigDecimal.ZERO) > 0) {
 					estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_LABOUR_FEE)
