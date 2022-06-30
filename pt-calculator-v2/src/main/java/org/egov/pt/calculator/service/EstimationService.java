@@ -819,7 +819,8 @@ public class EstimationService {
 		//Manual calculation
 		BigDecimal fee = getFee(property);
 		calculation.setTaxAmount(fee);
-		postProcessTheFee(requestInfo,property,calculation,additionalDetails);
+		// Rebate, penalty is not applicable on Application Fee
+		//postProcessTheFee(requestInfo,property,calculation,additionalDetails);
 		feeStructure.put(property.getAcknowldgementNumber(), calculation);
 		searchDemand(requestInfo,property,calculation,feeStructure);
 
