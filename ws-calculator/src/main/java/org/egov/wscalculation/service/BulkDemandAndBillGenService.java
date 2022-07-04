@@ -152,7 +152,11 @@ public class BulkDemandAndBillGenService {
 
 			Long fromDate = (Long) financialYearMaster.get(WSCalculationConstant.STARTING_DATE_APPLICABLES);
 			Long toDate = (Long) financialYearMaster.get(WSCalculationConstant.ENDING_DATE_APPLICABLES);
-			Long expiryDate = (Long) financialYearMaster.get(WSCalculationConstant.Demand_Expiry_Date_String);
+			
+			/* Manage bill expiry date based on rebate date */
+//			Long expiryDate = (Long) financialYearMaster.get(WSCalculationConstant.Demand_Expiry_Date_String);
+			Long expiryDate = demandService.getBillExpiryDate(requestInfo, tenantId);
+			
 			BigDecimal minimumPayableAmount = isForConnectionNO ? configs.getMinimumPayableAmount()
 					: calculation.getTotalAmount();
 			String businessService = isForConnectionNO ? configs.getBusinessService()
