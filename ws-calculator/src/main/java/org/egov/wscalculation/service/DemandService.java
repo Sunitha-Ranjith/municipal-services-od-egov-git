@@ -3,6 +3,7 @@ package org.egov.wscalculation.service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,6 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -201,7 +203,11 @@ public class DemandService {
 
 			Long fromDate = (Long) financialYearMaster.get(WSCalculationConstant.STARTING_DATE_APPLICABLES);
 			Long toDate = (Long) financialYearMaster.get(WSCalculationConstant.ENDING_DATE_APPLICABLES);
-			Long expiryDate = (Long) financialYearMaster.get(WSCalculationConstant.Demand_Expiry_Date_String);
+			
+			/* Manage bill expiry date based on rebate date */
+//			Long expiryDate = (Long) financialYearMaster.get(WSCalculationConstant.Demand_Expiry_Date_String);
+			Long expiryDate = getBillExpiryDate(requestInfo, tenantId);
+			
 			BigDecimal minimumPayableAmount = isForConnectionNO ? configs.getMinimumPayableAmount()
 					: calculation.getTotalAmount();
 			String businessService = isForConnectionNO ? configs.getBusinessService()
@@ -471,7 +477,10 @@ public class DemandService {
 		List<Demand> demandsToBeUpdated = new LinkedList<>();
 
 		String tenantId = getBillCriteria.getTenantId();
-
+		
+		/* Manage bill expiry date based on rebate date */
+		Long billExpiryTime = getBillExpiryDate(requestInfo, tenantId);
+		
 		List<TaxPeriod> taxPeriods = mstrDataService.getTaxPeriodList(requestInfoWrapper.getRequestInfo(), tenantId, WSCalculationConstant.SERVICE_FIELD_VALUE_WS);
 		long latestDemandPeriodTo = res.getDemands().stream().filter(demand -> !(WSCalculationConstant.DEMAND_CANCELLED_STATUS.equalsIgnoreCase(demand.getStatus().toString())))
 				.mapToLong(Demand::getTaxPeriodTo).max().orElse(0);
@@ -489,6 +498,7 @@ public class DemandService {
 				}
 				addRoundOffTaxHead(tenantId, demand.getDemandDetails());
 			}
+			demand.setBillExpiryTime(billExpiryTime);
 			demandsToBeUpdated.add(demand);
 		});
 
@@ -1140,5 +1150,36 @@ public class DemandService {
 			return null;
 		}
 	}
+	
+	public Long getBillExpiryDate(RequestInfo requestInfo, String tenantId) {
+		Map<String, Object> masterMap = new HashMap<>();
+		mstrDataService.loadBillingSlabsAndTimeBasedExemptions(requestInfo, tenantId, masterMap);
+		
+		@SuppressWarnings("unchecked")
+		List<Object> rebateMaster = (List<Object>) masterMap.get(WSCalculationConstant.WC_REBATE_MASTER);
+		
+		Calendar today = Calendar.getInstance();
+		int expiryDay = getExpiryDay(today, rebateMaster);
+		int dayDiff = expiryDay - today.get(Calendar.DATE);
+		return TimeUnit.DAYS.toMillis(dayDiff);
+	}
 
+	private int getExpiryDay(Calendar cal, List<Object> rebateMaster) {
+		Map<String, Object> rebate = mstrDataService.getApplicableMaster(calculatorUtils.getFinancialYear(), rebateMaster);
+		int rebateEndingDay = Integer.parseInt((String) rebate.get(WSCalculationConstant.ENDING_DATE_APPLICABLES));
+		int today = cal.get(Calendar.DATE);
+		if(today <= 10) {
+			if(rebateEndingDay <= 15) {
+				return rebateEndingDay;
+			} else {
+				return 15;
+			}
+		} else if(today <= rebateEndingDay) {
+			return rebateEndingDay;
+		} else if(today > rebateEndingDay) {
+			return cal.getActualMaximum(Calendar.DATE);
+		}
+		return cal.get(Calendar.DATE);
+	}
+	
 }
